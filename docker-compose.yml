@@ -1,0 +1,37 @@
+name: ${WP_NAME}
+
+services:
+  app:
+    image: wordpress:${WP_VERSION}
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - ${WP_PORT}:80
+    environment:
+      WORDPRESS_DB_HOST: ${DB_HOST}:${DB_PORT}
+      WORDPRESS_DB_NAME: ${DB_DATABASE}
+      WORDPRESS_DB_USER: ${DB_USERNAME}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('AUTOMATIC_UPDATER_DISABLED', true);
+    volumes:
+      - app_data:/var/www/html
+      - ./${WP_NAME}/themes:/var/www/html/wp-content/themes
+      - ./${WP_NAME}/plugins:/var/www/html/wp-content/plugins
+
+  db:
+    image: mysql:${DB_VERSION}
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./${WP_NAME}/sql:/sql
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+
+volumes:
+  app_data:
+  db_data:
